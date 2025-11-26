@@ -13,16 +13,19 @@ import java.awt.event.ActionListener;
 import java.util.List;
 import java.util.Vector;
 import java.sql.SQLException;
+import java.sql.Connection;
 import project.oop.Assignment;
 import project.oop.Bus;
 import project.oop.Driver;
 import project.oop.Route;
+import project.oop.utils.ConnectionManager;
 
 public class GUI extends JFrame {
-    private final DriverDAO driverDAO = new DriverDAO();
-    private final AssignmentDAO assignmentDAO = new AssignmentDAO();
-    private final BusDAO busDAO = new BusDAO(); 
-    private final RouteDAO routeDAO = new RouteDAO();
+    Connection conn= ConnectionManager.GetConnection();
+    private final DriverDAO driverDAO = new DriverDAO(conn);
+    private final AssignmentDAO assignmentDAO = new AssignmentDAO(conn);
+    private final BusDAO busDAO = new BusDAO(conn); 
+    private final RouteDAO routeDAO = new RouteDAO(conn);
     
     private JTable driverTable;
     private DefaultTableModel driverTableModel;

@@ -3,6 +3,7 @@ package project.oop.dao;
 
 import project.oop.Driver;
 import project.oop.utils.JDBCUtils;
+import project.oop.utils.ConnectionManager;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -12,6 +13,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DriverDAO {
+    private Connection connection;
+    public DriverDAO(Connection connection) {
+        this.connection= connection;
+    }
     private static final String INSERT_DRIVER_SQL = "INSERT INTO driver (id, name, phone_number, address, license_number, salary, experience_years)VALUES (?, ?, ?, ?, ?, ?, ?)";
     private static final String SELECT_DRIVER_BY_ID = "SELECT * FROM driver WHERE id = ?";
     private static final String SELECT_ALL_DRIVERS = "SELECT * FROM driver";
@@ -25,8 +30,7 @@ public class DriverDAO {
             return;
         }
         System.out.println (INSERT_DRIVER_SQL);
-        try (Connection connection = JDBCUtils.getConnection();
-                PreparedStatement preparedStatement = connection.prepareStatement(INSERT_DRIVER_SQL)
+        try (PreparedStatement preparedStatement = connection.prepareStatement(INSERT_DRIVER_SQL)
                 ) {
             preparedStatement.setString (1, driver.getId());
             preparedStatement.setString (2, driver.getName());
@@ -45,8 +49,7 @@ public class DriverDAO {
     
     public Driver FindDriverById(String id) {
         Driver driver = null;
-        try (Connection connection = JDBCUtils.getConnection();
-                PreparedStatement preparedStatement = connection.prepareStatement(SELECT_DRIVER_BY_ID)){
+        try (PreparedStatement preparedStatement = connection.prepareStatement(SELECT_DRIVER_BY_ID)){
             preparedStatement.setString(1,id);
             
             ResultSet rs = preparedStatement.executeQuery();
@@ -70,8 +73,7 @@ public class DriverDAO {
     public List<Driver> ListAllDriver() {
         List<Driver> driverList = new ArrayList<>();
         
-        try (Connection connection = JDBCUtils.getConnection();
-                PreparedStatement preparedStatement = connection.prepareStatement(SELECT_ALL_DRIVERS)) {
+        try (PreparedStatement preparedStatement = connection.prepareStatement(SELECT_ALL_DRIVERS)) {
             
             ResultSet rs = preparedStatement.executeQuery();
             
@@ -95,8 +97,7 @@ public class DriverDAO {
     
     public int GetTotalDrivers() {
         int count = 0;
-        try (Connection connection = JDBCUtils.getConnection();
-                PreparedStatement preparedStatement = connection.prepareStatement(COUNT_DRIVERS_SQL);
+        try (PreparedStatement preparedStatement = connection.prepareStatement(COUNT_DRIVERS_SQL);
                 ResultSet rs = preparedStatement.executeQuery()){
            if (rs.next()) {
                count = rs.getInt(1);
@@ -109,8 +110,7 @@ public class DriverDAO {
     
     public boolean updateDriverSalary (String id, double newSalary) {
         boolean rowUpdated = false;
-        try (Connection connection = JDBCUtils.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(UPDATE_SALARY_SQL)) {
+        try (PreparedStatement preparedStatement = connection.prepareStatement(UPDATE_SALARY_SQL)) {
             
             preparedStatement.setDouble (1, newSalary);
             preparedStatement.setString (2, id);
@@ -130,8 +130,7 @@ public class DriverDAO {
     
     public boolean RemoveDriver (String id) {
         boolean rowDeleted = false;
-         try (Connection connection = JDBCUtils.getConnection();
-             PreparedStatement statement = connection.prepareStatement(DELETE_DRIVER_SQL)) {
+         try (PreparedStatement statement = connection.prepareStatement(DELETE_DRIVER_SQL)) {
             
              statement.setString (1, id);
              rowDeleted = statement.executeUpdate() > 0;

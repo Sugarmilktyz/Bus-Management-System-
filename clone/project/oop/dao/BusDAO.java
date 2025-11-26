@@ -3,6 +3,7 @@ package project.oop.dao;
 
 import project.oop.Bus;
 import project.oop.utils.JDBCUtils;
+import project.oop.utils.ConnectionManager;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -12,7 +13,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class BusDAO {
-        private static final String INSERT_BUS_SQL = "INSERT INTO bus (id, license_plate, capacity, model, purchase_year, is_active) VALUES (?, ?, ?, ?, ?, ?)";
+    private Connection connection;
+    
+    public BusDAO( Connection connection) {
+        this.connection= connection;
+    }
+    private static final String INSERT_BUS_SQL = "INSERT INTO bus (id, license_plate, capacity, model, purchase_year, is_active) VALUES (?, ?, ?, ?, ?, ?)";
     private static final String SELECT_BUS_BY_ID = "SELECT * FROM bus WHERE id = ?";
     private static final String SELECT_ALL_BUSES = "SELECT * FROM bus";
     private static final String DELETE_BUS_SQL = "DELETE FROM bus WHERE id = ?";
@@ -26,8 +32,7 @@ public class BusDAO {
             return;
         }
         System.out.println (INSERT_BUS_SQL);
-        try (Connection connection = JDBCUtils.getConnection();
-                PreparedStatement preparedStatement = connection.prepareStatement(INSERT_BUS_SQL)
+        try (PreparedStatement preparedStatement = connection.prepareStatement(INSERT_BUS_SQL)
                 ) {
             preparedStatement.setString(1, bus.getId());
             preparedStatement.setString(2, bus.getLicensePlate());
@@ -45,8 +50,7 @@ public class BusDAO {
     
     public Bus FindBusById(String id) {
         Bus bus = null;
-        try (Connection connection = JDBCUtils.getConnection();
-                PreparedStatement preparedStatement = connection.prepareStatement(SELECT_BUS_BY_ID)){
+        try (PreparedStatement preparedStatement = connection.prepareStatement(SELECT_BUS_BY_ID)){
             preparedStatement.setString(1,id);
             
             ResultSet rs = preparedStatement.executeQuery();
@@ -69,8 +73,7 @@ public class BusDAO {
     public List<Bus> ListAllBuses() {
         List<Bus> busList = new ArrayList<>();
         
-        try (Connection connection = JDBCUtils.getConnection();
-                PreparedStatement preparedStatement = connection.prepareStatement(SELECT_ALL_BUSES)) {
+        try (PreparedStatement preparedStatement = connection.prepareStatement(SELECT_ALL_BUSES)) {
             
             ResultSet rs = preparedStatement.executeQuery();
             
@@ -93,8 +96,7 @@ public class BusDAO {
     
     public int GetTotalBuses() {
         int count = 0;
-        try (Connection connection = JDBCUtils.getConnection();
-                PreparedStatement preparedStatement = connection.prepareStatement(COUNT_BUSES_SQL);
+        try (PreparedStatement preparedStatement = connection.prepareStatement(COUNT_BUSES_SQL);
                 ResultSet rs = preparedStatement.executeQuery()){
            if (rs.next()) {
                count = rs.getInt(1);
@@ -107,8 +109,7 @@ public class BusDAO {
     
     public boolean updateBusCapacity(String id, int newCapacity) {
         boolean rowUpdated = false;
-        try (Connection connection = JDBCUtils.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(UPDATE_CAPACITY_SQL)) {
+        try (PreparedStatement preparedStatement = connection.prepareStatement(UPDATE_CAPACITY_SQL)) {
 
             preparedStatement.setInt(1, newCapacity);
             preparedStatement.setString(2, id);
@@ -129,8 +130,7 @@ public class BusDAO {
     
         public boolean updateBusStatus(String id, boolean isActive) {
         boolean rowUpdated = false;
-        try (Connection connection = JDBCUtils.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(UPDATE_STATUS_SQL)) {
+        try (PreparedStatement preparedStatement = connection.prepareStatement(UPDATE_STATUS_SQL)) {
 
             preparedStatement.setBoolean(1, isActive);
             preparedStatement.setString(2, id);
@@ -151,8 +151,7 @@ public class BusDAO {
     
     public boolean RemoveBus (String id) {
         boolean rowDeleted = false;
-         try (Connection connection = JDBCUtils.getConnection();
-             PreparedStatement statement = connection.prepareStatement(DELETE_BUS_SQL)) {
+         try (PreparedStatement statement = connection.prepareStatement(DELETE_BUS_SQL)) {
             
              statement.setString (1, id);
              rowDeleted = statement.executeUpdate() > 0;

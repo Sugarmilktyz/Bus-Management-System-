@@ -9,8 +9,13 @@ import java.util.ArrayList;
 import java.util.List;
 import project.oop.Route;
 import project.oop.utils.JDBCUtils;
+import project.oop.utils.ConnectionManager;
 
 public class RouteDAO {
+    private Connection connection;
+    public RouteDAO (Connection connection){
+        this.connection= connection;
+    }
     private static final String INSERT_ROUTE_SQL = "INSERT INTO route (id, name, start_point, end_point, distance) VALUES (?, ?, ?, ?, ?)";
     private static final String SELECT_ROUTE_BY_ID = "SELECT * FROM route WHERE id = ?";
     private static final String SELECT_ALL_ROUTES = "SELECT * FROM route";
@@ -25,8 +30,7 @@ public class RouteDAO {
             return;
         }
         System.out.println (INSERT_ROUTE_SQL);
-        try (Connection connection = JDBCUtils.getConnection();
-                PreparedStatement preparedStatement = connection.prepareStatement(INSERT_ROUTE_SQL)
+        try (PreparedStatement preparedStatement = connection.prepareStatement(INSERT_ROUTE_SQL)
                 ) {
             preparedStatement.setString(1, route.getId());
             preparedStatement.setString(2, route.getName());
@@ -43,8 +47,7 @@ public class RouteDAO {
     
     public Route FindRouteById(String id) {
         Route route = null;
-        try (Connection connection = JDBCUtils.getConnection();
-                PreparedStatement preparedStatement = connection.prepareStatement(SELECT_ROUTE_BY_ID)){
+        try (PreparedStatement preparedStatement = connection.prepareStatement(SELECT_ROUTE_BY_ID)){
             preparedStatement.setString(1,id);
             
             ResultSet rs = preparedStatement.executeQuery();
@@ -66,8 +69,7 @@ public class RouteDAO {
     public List<Route> ListAllRoutes() {
         List<Route> routeList = new ArrayList<>();
         
-        try (Connection connection = JDBCUtils.getConnection();
-                PreparedStatement preparedStatement = connection.prepareStatement(SELECT_ALL_ROUTES)) {
+        try (PreparedStatement preparedStatement = connection.prepareStatement(SELECT_ALL_ROUTES)) {
             
             ResultSet rs = preparedStatement.executeQuery();
             
@@ -89,8 +91,7 @@ public class RouteDAO {
     
     public int GetTotalRoutes() {
         int count = 0;
-        try (Connection connection = JDBCUtils.getConnection();
-                PreparedStatement preparedStatement = connection.prepareStatement(COUNT_ROUTES_SQL);
+        try (PreparedStatement preparedStatement = connection.prepareStatement(COUNT_ROUTES_SQL);
                 ResultSet rs = preparedStatement.executeQuery()){
            if (rs.next()) {
                count = rs.getInt(1);
@@ -103,8 +104,7 @@ public class RouteDAO {
     
     public boolean updateRouteDistance(String id, double newDistance) {
         boolean rowUpdated = false;
-        try (Connection connection = JDBCUtils.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(UPDATE_DISTANCE_SQL)) {
+        try (PreparedStatement preparedStatement = connection.prepareStatement(UPDATE_DISTANCE_SQL)) {
 
             preparedStatement.setDouble(1, newDistance);
             preparedStatement.setString(2, id);
@@ -125,8 +125,7 @@ public class RouteDAO {
     
     public boolean RemoveRoute (String id) {
         boolean rowDeleted = false;
-         try (Connection connection = JDBCUtils.getConnection();
-             PreparedStatement statement = connection.prepareStatement(DELETE_ROUTE_SQL)) {
+         try (PreparedStatement statement = connection.prepareStatement(DELETE_ROUTE_SQL)) {
             
              statement.setString (1, id);
              rowDeleted = statement.executeUpdate() > 0;
