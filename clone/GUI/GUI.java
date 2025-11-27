@@ -53,7 +53,6 @@ public class GUI extends JFrame {
         
         add(tabbedPane, BorderLayout.CENTER);
         
-        initializeData();
         
         loadDriverData();
         loadAssignmentData();
@@ -231,7 +230,6 @@ public class GUI extends JFrame {
         JScrollPane scrollPane = new JScrollPane(assignmentTable);
         panel.add(scrollPane, BorderLayout.CENTER);
         
-        // 2. Cấu hình Vùng nút bấm
         JPanel controlPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 10));
         
         JButton addButton = new JButton("📝 Add Assignment");
@@ -280,12 +278,10 @@ public class GUI extends JFrame {
         JComboBox<String> driverCombo = new JComboBox<>(driverIds);
         JComboBox<String> busCombo = new JComboBox<>(busIds);
         JComboBox<String> routeCombo = new JComboBox<>(routeIds);
-        JTextField dateField = new JTextField("YYYY-MM-DD");
+        JTextField dateField = new JTextField();
         JComboBox<String> shiftCombo = new JComboBox<>(shifts);
 
         JPanel panel = new JPanel(new GridLayout(0, 2, 5, 5));
-        panel.add(new JLabel("ID:"));
-        panel.add(idField);
         panel.add(new JLabel("Driver (ID):"));
         panel.add(driverCombo);
         panel.add(new JLabel("Bus (ID):"));
@@ -302,7 +298,6 @@ public class GUI extends JFrame {
         if (result == JOptionPane.OK_OPTION) {
             try {
                 Assignment newAsn = new Assignment(
-                    idField.getText().trim(),
                     driverCombo.getSelectedItem().toString(),
                     busCombo.getSelectedItem().toString(),
                     routeCombo.getSelectedItem().toString(),
@@ -313,7 +308,7 @@ public class GUI extends JFrame {
                 assignmentDAO.AddAssignment(newAsn); 
 
                 loadAssignmentData();
-                JOptionPane.showMessageDialog(this, "Try adding a Completed Assignment. Check Console for Validation errors (Duplicate Schedule/Vehicle Inactive).", "Assignment Results", JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Successful", "Assignment Results", JOptionPane.INFORMATION_MESSAGE);
 
             } catch (Exception e) {
                 JOptionPane.showMessageDialog(this, "Error adding Assignment: " + e.getMessage(), "System Error", JOptionPane.ERROR_MESSAGE);
@@ -345,34 +340,6 @@ public class GUI extends JFrame {
     }
 
 
-    // ----------------------------------------------------
-    // PHẦN 3: KHỞI TẠO DỮ LIỆU VÀ CHẠY APP
-    // ----------------------------------------------------
-    
-    private void initializeData() {
-        // Dữ liệu Driver
-        Driver d1 = new Driver ("D001", "Nguyen Van A", "012345678", "123 P.Nam", "B2-2020-A", 28000000.0, 7);
-        Driver d5 = new Driver ("D005", "Le Thi B", "876543210", "345 P.Bac", "B2-2018-B", 30000000.0, 10);
-        driverDAO.AddDriver(d1);
-        driverDAO.AddDriver(d5);
-        
-        // Dữ liệu Bus
-        Bus b1 = new Bus("B001", "51H-123.45", 45, "Hyundai Universe", 2020, true);
-        Bus b2 = new Bus("B002", "50F-999.88", 29, "Samco Felix", 2018, false); // INACTIVE
-        busDAO.AddBus(b1);
-        busDAO.AddBus(b2);
-
-        // Dữ liệu Route
-        Route r1 = new Route("R01", "Ben Thanh - Suoi Tien", "Ben Thanh", "Suoi Tien", 30.5);
-        Route r2 = new Route("R02", "CV 23/9 - Bach Khoa", "Cong vien 23/9", "Đai hoc Bach Khoa", 15.0);
-        routeDAO.AddRoute(r1);
-        routeDAO.AddRoute(r2);
-        
-        Assignment asn1 = new Assignment("ASN001", "D001", "B001", "R01", "2025-12-01", "Morning");
-        assignmentDAO.AddAssignment(asn1);
-        Assignment asn6 = new Assignment("ASN006", "D002", "B001", "R01", "2025-12-01", "Evening");
-        assignmentDAO.AddAssignment(asn6);
-    }
 
 
     public static void main(String[] args) {

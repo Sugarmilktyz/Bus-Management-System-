@@ -27,6 +27,8 @@ public class AssignmentDAO {
     private static final String CHECK_OVERLAP_SQL = "SELECT COUNT(*) FROM assignment " + "WHERE (driver_id = ? OR bus_id = ?) " + "AND assignment_date = ? AND shift = ?";
     
     private static final String CHECK_BUS_ACTIVE_SQL = "SELECT is_active FROM bus WHERE id = ?";
+    private static final String GET_LAST_ID_SQL = "SELECT id FROM assignment ORDER BY id DESC LIMIT 1";
+
     
     private static final String REPORT_ASSIGNMENTS_SQL =
             "SELECT a.id, d.name AS driver_name, b.license_plate, r.name AS route_name, a.assignment_date, a.shift " +
@@ -64,13 +66,27 @@ public class AssignmentDAO {
             }
         }
     }
+    
+    public String GetNextAssignmentId(){
+        try(PreparedStatement preparedStatement= connection.prepareStatement(GET_LAST_ID_SQL);
+            ResultSet rs = preparedStatement.executeQuery()){
+                if (rs.next()){
+                    String LastId= rs.getString("id");
+                    int number = Integer.parseInt(LastId.substring(1));
+                    number++;
+                    
+                    return String.format("A%03d", number);
+                }
+        } catch (SQLException e){
+            System.err.println("Error when generating assignment ID:"+ e.getMessage());
+        }
+        return "A001";
+    }
+    
 
     public void AddAssignment(Assignment assignment) {
-        
-        if (FindAssignmentById(assignment.getId()) != null) {
-            System.err.println("Error, Assignment ID " + assignment.getId() + " already exists.");
-            return;
-        }
+        String NewId = GetNextAssignmentId();
+        assignment.setId(NewId);
 
         try {
             
@@ -85,7 +101,7 @@ public class AssignmentDAO {
             }
 
             try (PreparedStatement preparedStatement = connection.prepareStatement(INSERT_ASSIGNMENT_SQL)) {
-                preparedStatement.setString(1, assignment.getId());
+                preparedStatement.setString(1, NewId);
                 preparedStatement.setString(2, assignment.getDriverId());
                 preparedStatement.setString(3, assignment.getBusId());
                 preparedStatement.setString(4, assignment.getRouteId());
