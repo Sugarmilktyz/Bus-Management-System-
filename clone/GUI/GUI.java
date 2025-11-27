@@ -44,7 +44,7 @@ public class GUI extends JFrame {
         setLayout(new BorderLayout());
 
         JTabbedPane tabbedPane = new JTabbedPane();
-        tabbedPane.setFont(new Font("Arial", Font.BOLD, 14));
+        tabbedPane.setFont(new Font("Times New Roman", Font.BOLD, 14));
         
         
         tabbedPane.addTab("Driver", createDriverPanel());
@@ -65,7 +65,7 @@ public class GUI extends JFrame {
         String[] driverColumns = {"Id", "name", "phone_number", "address", "license_number", "salary", "experience_years"};
         driverTableModel = new DefaultTableModel(driverColumns, 0);
         driverTable = new JTable(driverTableModel);
-        driverTable.setFont(new Font("Arial", Font.PLAIN, 12));
+        driverTable.setFont(new Font("Times New Roman", Font.PLAIN, 12));
         driverTable.setRowHeight(25);
         
         JScrollPane scrollPane = new JScrollPane(driverTable);
@@ -224,7 +224,7 @@ public class GUI extends JFrame {
         String[] assignmentColumns = {"ID ASSN", "DriverId", "License Plate", "Route Name", "Date", "Shift"};
         assignmentTableModel = new DefaultTableModel(assignmentColumns, 0);
         assignmentTable = new JTable(assignmentTableModel);
-        assignmentTable.setFont(new Font("Arial", Font.PLAIN, 12));
+        assignmentTable.setFont(new Font("Times New Roman", Font.PLAIN, 12));
         assignmentTable.setRowHeight(25);
 
         JScrollPane scrollPane = new JScrollPane(assignmentTable);
@@ -272,7 +272,7 @@ public class GUI extends JFrame {
         String[] driverIds = drivers.stream().map(Driver::getId).toArray(String[]::new);
         String[] busIds = buses.stream().map(Bus::getId).toArray(String[]::new);
         String[] routeIds = routes.stream().map(Route::getId).toArray(String[]::new);
-        String[] shifts = {"morning", "evening", "night"};
+        String[] shifts = {"Morning", "Evening", "Night"};
 
         JTextField idField = new JTextField(5);
         JComboBox<String> driverCombo = new JComboBox<>(driverIds);
@@ -339,7 +339,9 @@ public class GUI extends JFrame {
         }
     }
 
-
+    // ----------------------------------------------------
+    // PHẦN 3: PANEL BUS
+    // ----------------------------------------------------
 
 
     public static void main(String[] args) {
