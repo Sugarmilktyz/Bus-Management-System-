@@ -25,6 +25,23 @@ public class BusDAO {
     private static final String UPDATE_CAPACITY_SQL = "UPDATE bus SET capacity = ? WHERE id = ?";
     private static final String UPDATE_STATUS_SQL = "UPDATE bus SET is_active = ? WHERE id = ?";
     private static final String COUNT_BUSES_SQL = "SELECT COUNT(*) FROM bus";
+    private static final String GET_LAST_ID_SQL = "SELECT id FROM bus ORDER BY id DESC LIMIT 1";
+
+    public String GetNextDriverId(){
+        try(PreparedStatement preparedStatement= connection.prepareStatement(GET_LAST_ID_SQL);
+            ResultSet rs = preparedStatement.executeQuery()){
+                if (rs.next()){
+                    String LastId= rs.getString("id");
+                    int number = Integer.parseInt(LastId.substring(1));
+                    number++;
+                    
+                    return String.format("D%03d", number);
+                }
+        } catch (SQLException e){
+            System.err.println("Error when generating driver ID:"+ e.getMessage());
+        }
+        return "D001";
+    }
     
     public void AddBus (Bus bus) {
         if (FindBusById(bus.getId()) != null) {

@@ -17,6 +17,11 @@ public class Assignment {
         this.assignmentDate = assignmentDate;
         this.shift = shift;
     }
+ 
+    public Assignment(String driverId, String busId, String routeId, String assignmentDate, String shift) {
+        this(null, driverId, busId, routeId, assignmentDate, shift);
+    }
+    
 
     public String getId() { 
         return id; 
