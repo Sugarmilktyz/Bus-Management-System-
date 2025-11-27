@@ -12,6 +12,9 @@ public class Driver extends Person {
         this.salary= salary;
         this.experienceYears= experienceYears;
     }
+    public Driver (String name, String phoneNumber, String address, String licenseNumber, double salary, int experienceYears){
+        this (null, name, phoneNumber, address, licenseNumber, salary, experienceYears);
+    }
     
     public String getLicenseNumber (){
         return licenseNumber;
@@ -41,7 +44,7 @@ public class Driver extends Person {
     public void displayDetail () {
         System.out.println ("----Detail of Driver----");
         System.out.println (super.toString());
-        System.out.println("Address: " + getAddress()); // Sử dụng getter của lớp cha
+        System.out.println("Address: " + getAddress());
         System.out.println("License: " + licenseNumber);
         System.out.println("Experience: " + experienceYears + " years");
         System.out.printf("Salary: %.0f VND%n", salary);

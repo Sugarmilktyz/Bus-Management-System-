@@ -111,7 +111,6 @@ public class GUI extends JFrame {
     }
     
     private void showAddDriverDialog() {
-        JTextField idField = new JTextField(5);
         JTextField nameField = new JTextField(10);
         JTextField phoneField = new JTextField(10);
         JTextField addressField = new JTextField(15);
@@ -120,8 +119,6 @@ public class GUI extends JFrame {
         JTextField experienceField = new JTextField(5);
 
         JPanel panel = new JPanel(new GridLayout(0, 2, 5, 5));
-        panel.add(new JLabel("ID:"));
-        panel.add(idField);
         panel.add(new JLabel("Name:"));
         panel.add(nameField);
         panel.add(new JLabel("Phone No:"));
@@ -140,7 +137,6 @@ public class GUI extends JFrame {
         if (result == JOptionPane.OK_OPTION) {
             try {
                 Driver newDriver = new Driver(
-                    idField.getText().trim(),
                     nameField.getText().trim(),
                     phoneField.getText().trim(),
                     addressField.getText().trim(),
@@ -149,7 +145,7 @@ public class GUI extends JFrame {
                     Integer.parseInt(experienceField.getText().trim())
                 );
                 driverDAO.AddDriver(newDriver);
-                loadDriverData(); // Cập nhật lại bảng
+                loadDriverData();
                 JOptionPane.showMessageDialog(this, "Add driver Successful", "Success", JOptionPane.INFORMATION_MESSAGE);
             } catch (NumberFormatException ex) {
                 JOptionPane.showMessageDialog(this, "Salary and experience_year must be a valid number", "error when entering data", JOptionPane.ERROR_MESSAGE);

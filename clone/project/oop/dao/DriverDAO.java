@@ -23,16 +23,31 @@ public class DriverDAO {
     private static final String DELETE_DRIVER_SQL = "DELETE FROM driver WHERE id = ?";
     private static final String UPDATE_SALARY_SQL = "UPDATE driver SET salary = ? WHERE id = ?";
     private static final String COUNT_DRIVERS_SQL = "SELECT COUNT(*) FROM driver";
+    private static final String GET_LAST_ID_SQL = "SELECT id FROM driver ORDER BY id DESC LIMIT 1";
+    
+    public String GetNextDriverId(){
+        try(PreparedStatement preparedStatement= connection.prepareStatement(GET_LAST_ID_SQL);
+            ResultSet rs = preparedStatement.executeQuery()){
+                if (rs.next()){
+                    String LastId= rs.getString("id");
+                    int number = Integer.parseInt(LastId.substring(1));
+                    number++;
+                    
+                    return String.format("D%03d", number);
+                }
+        } catch (SQLException e){
+            System.err.println("Error when generating driver ID:"+ e.getMessage());
+        }
+        return "D001";
+    }
     
     public void AddDriver (Driver driver) {
-        if (FindDriverById(driver.getId()) != null) {
-            System.err.println ("Error, this ID driver" + driver.getId()+ " already exist");
-            return;
-        }
+        String NewId = GetNextDriverId();
+        driver.setId(NewId);
         System.out.println (INSERT_DRIVER_SQL);
         try (PreparedStatement preparedStatement = connection.prepareStatement(INSERT_DRIVER_SQL)
                 ) {
-            preparedStatement.setString (1, driver.getId());
+            preparedStatement.setString (1, NewId);
             preparedStatement.setString (2, driver.getName());
             preparedStatement.setString (3, driver.getPhoneNumber());
             preparedStatement.setString (4, driver.getAddress());
