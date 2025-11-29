@@ -12,7 +12,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DriverDAO {
+public class DriverDAO implements CrudDAO<Driver> {
     private Connection connection;
     public DriverDAO(Connection connection) {
         this.connection= connection;
@@ -21,7 +21,7 @@ public class DriverDAO {
     private static final String SELECT_DRIVER_BY_ID = "SELECT * FROM driver WHERE id = ?";
     private static final String SELECT_ALL_DRIVERS = "SELECT * FROM driver";
     private static final String DELETE_DRIVER_SQL = "DELETE FROM driver WHERE id = ?";
-    private static final String UPDATE_SALARY_SQL = "UPDATE driver SET salary = ? WHERE id = ?";
+    private static final String UPDATE_DRIVER_SQL = "UPDATE driver SET name=?, phone_number=?, address=?, license_number=?, salary=?, experience_years=? WHERE id = ?";
     private static final String COUNT_DRIVERS_SQL = "SELECT COUNT(*) FROM driver";
     private static final String GET_LAST_ID_SQL = "SELECT id FROM driver ORDER BY id DESC LIMIT 1";
     
@@ -40,14 +40,13 @@ public class DriverDAO {
         }
         return "D001";
     }
-    
-    public void AddDriver (Driver driver) {
-        String NewId = GetNextDriverId();
-        driver.setId(NewId);
+
+@Override
+    public boolean Add (Driver driver) {
         System.out.println (INSERT_DRIVER_SQL);
         try (PreparedStatement preparedStatement = connection.prepareStatement(INSERT_DRIVER_SQL)
                 ) {
-            preparedStatement.setString (1, NewId);
+            preparedStatement.setString (1, driver.getId());
             preparedStatement.setString (2, driver.getName());
             preparedStatement.setString (3, driver.getPhoneNumber());
             preparedStatement.setString (4, driver.getAddress());
@@ -55,14 +54,16 @@ public class DriverDAO {
             preparedStatement.setDouble (6, driver.getSalary());
             preparedStatement.setInt (7, driver.getExperienceYears());
             
-            preparedStatement.executeUpdate();
-            System.out.println("Driver " +driver.getId()+ " added successfully name:" + driver.getName());
+            return preparedStatement.executeUpdate()> 0;
+
         } catch (SQLException e) {
             System.err.println ("Error when adding Driver into the Database: " +e.getMessage());
+            return false;
         }
     }
-    
-    public Driver FindDriverById(String id) {
+  
+@Override
+    public Driver FindById(String id) {
         Driver driver = null;
         try (PreparedStatement preparedStatement = connection.prepareStatement(SELECT_DRIVER_BY_ID)){
             preparedStatement.setString(1,id);
@@ -85,7 +86,8 @@ public class DriverDAO {
         return driver;
     }
     
-    public List<Driver> ListAllDriver() {
+@Override
+    public List<Driver> SelectAll() {
         List<Driver> driverList = new ArrayList<>();
         
         try (PreparedStatement preparedStatement = connection.prepareStatement(SELECT_ALL_DRIVERS)) {
@@ -123,41 +125,33 @@ public class DriverDAO {
         return count;
     }
     
-    public boolean updateDriverSalary (String id, double newSalary) {
-        boolean rowUpdated = false;
-        try (PreparedStatement preparedStatement = connection.prepareStatement(UPDATE_SALARY_SQL)) {
+@Override
+    public boolean Update (Driver driver){
+        try (PreparedStatement preparedStatement = connection.prepareStatement(UPDATE_DRIVER_SQL)) {
+            preparedStatement.setString(1, driver.getName());
+            preparedStatement.setString(2, driver.getPhoneNumber());
+            preparedStatement.setString(3, driver.getAddress());
+            preparedStatement.setString(4, driver.getLicenseNumber());
+            preparedStatement.setDouble(5, driver.getSalary());
+            preparedStatement.setInt(6, driver.getExperienceYears());
+            preparedStatement.setString(7, driver.getId()); 
             
-            preparedStatement.setDouble (1, newSalary);
-            preparedStatement.setString (2, id);
-            
-            rowUpdated = preparedStatement.executeUpdate() > 0;
-            
-            if (rowUpdated) {
-                System.out.println ("Update Salary successfull for Driver:" + id);
-            } else {
-                System.err.println ("Cannot find " + id + " to update salary");
-            }
+            return preparedStatement.executeUpdate() > 0;
         } catch (SQLException e) {
-            System.err.println ("Error when updating Driver's salary: "+ e.getMessage());
+            System.err.println("Error when performing full update Driver: " + e.getMessage());
+            return false;
         }
-        return rowUpdated;
     }
-    
-    public boolean RemoveDriver (String id) {
-        boolean rowDeleted = false;
+
+@Override
+    public boolean Remove (String id) {
          try (PreparedStatement statement = connection.prepareStatement(DELETE_DRIVER_SQL)) {
             
              statement.setString (1, id);
-             rowDeleted = statement.executeUpdate() > 0;
-             
-             if (rowDeleted) {
-                 System.out.println ("Delete ID" + id +" Successful.");
-             } else {
-                 System.err.println ("Cannot find this ID" + id + " To Delete");
-             }
+             return statement.executeUpdate() > 0;
          } catch (SQLException e) {
              System.err.println("Error when delete Driver" + e.getMessage());
+             return false;
          }
-         return rowDeleted;
     }
 }    

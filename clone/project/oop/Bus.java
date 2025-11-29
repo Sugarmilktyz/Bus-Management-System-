@@ -16,6 +16,11 @@ public class Bus {
         this.isActive = isActive;
     }
     
+    public Bus(String licensePlate, int capacity, String model, int purchaseYear, boolean isActive) {
+        this (null, licensePlate, capacity, model, purchaseYear, isActive);
+    }
+
+    
     public String getId() {
         return id;
     }   

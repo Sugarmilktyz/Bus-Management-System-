@@ -1,4 +1,3 @@
-
 package project.oop.dao;
 
 import java.sql.Connection;
@@ -11,7 +10,7 @@ import project.oop.Route;
 import project.oop.utils.JDBCUtils;
 import project.oop.utils.ConnectionManager;
 
-public class RouteDAO {
+public class RouteDAO implements CrudDAO<Route> {
     private Connection connection;
     public RouteDAO (Connection connection){
         this.connection= connection;
@@ -20,15 +19,28 @@ public class RouteDAO {
     private static final String SELECT_ROUTE_BY_ID = "SELECT * FROM route WHERE id = ?";
     private static final String SELECT_ALL_ROUTES = "SELECT * FROM route";
     private static final String DELETE_ROUTE_SQL = "DELETE FROM route WHERE id = ?";
-    private static final String UPDATE_DISTANCE_SQL = "UPDATE route SET distance = ? WHERE id = ?"; // Thay thế update Salary/Capacity
+    private static final String UPDATE_ROUTE_SQL = "UPDATE route SET name=?, start_point=?, end_point=?, distance=? WHERE id = ?";
     private static final String COUNT_ROUTES_SQL = "SELECT COUNT(*) FROM route";
+    private static final String GET_LAST_ID_SQL = "SELECT id FROM route ORDER BY id DESC LIMIT 1";
 
-    
-    public void AddRoute (Route route) {
-        if (FindRouteById(route.getId()) != null) {
-            System.err.println("Error, this ID route" + route.getId() + " already exist");
-            return;
+    public String GetNextRouteId(){
+        try(PreparedStatement preparedStatement= connection.prepareStatement(GET_LAST_ID_SQL);
+            ResultSet rs = preparedStatement.executeQuery()){
+                if (rs.next()){
+                    String LastId= rs.getString("id");
+                    int number = Integer.parseInt(LastId.substring(1));
+                    number++;
+                    
+                    return String.format("R%03d", number);
+                }
+        } catch (SQLException e){
+            System.err.println("Error when generating route ID:"+ e.getMessage());
         }
+        return "R001";
+    }
+    
+@Override    
+    public boolean Add (Route route) {
         System.out.println (INSERT_ROUTE_SQL);
         try (PreparedStatement preparedStatement = connection.prepareStatement(INSERT_ROUTE_SQL)
                 ) {
@@ -38,14 +50,16 @@ public class RouteDAO {
             preparedStatement.setString(4, route.getEndPoint());
             preparedStatement.setDouble(5, route.getDistance());
             
-            preparedStatement.executeUpdate();
-            System.out.println("Route " + route.getId() + " added successfully name:" + route.getName());
+            return preparedStatement.executeUpdate()>0;
+
         } catch (SQLException e) {
             System.err.println ("Error when adding Route into the Database: " +e.getMessage());
+            return false;
         }
     }
-    
-    public Route FindRouteById(String id) {
+  
+@Override
+    public Route FindById(String id) {
         Route route = null;
         try (PreparedStatement preparedStatement = connection.prepareStatement(SELECT_ROUTE_BY_ID)){
             preparedStatement.setString(1,id);
@@ -65,8 +79,9 @@ public class RouteDAO {
         }
         return route;
     }
-    
-    public List<Route> ListAllRoutes() {
+
+@Override
+    public List<Route> SelectAll() {
         List<Route> routeList = new ArrayList<>();
         
         try (PreparedStatement preparedStatement = connection.prepareStatement(SELECT_ALL_ROUTES)) {
@@ -102,42 +117,31 @@ public class RouteDAO {
         return count;
     }
     
-    public boolean updateRouteDistance(String id, double newDistance) {
-        boolean rowUpdated = false;
-        try (PreparedStatement preparedStatement = connection.prepareStatement(UPDATE_DISTANCE_SQL)) {
-
-            preparedStatement.setDouble(1, newDistance);
-            preparedStatement.setString(2, id);
-
-            rowUpdated = preparedStatement.executeUpdate() > 0;
-
-            if (rowUpdated) {
-                System.out.println("Update Distance successfull for Route:" + id + " to " + newDistance + " km.");
-            } else {
-
-                System.err.println("Cannot find " + id + " to update distance");
-            }
+@Override
+    public boolean Update(Route route) {
+        try (PreparedStatement preparedStatement = connection.prepareStatement(UPDATE_ROUTE_SQL)) {
+            preparedStatement.setString(1, route.getName());
+            preparedStatement.setString(2, route.getStartPoint());
+            preparedStatement.setString(3, route.getEndPoint());
+            preparedStatement.setDouble(4, route.getDistance());
+            preparedStatement.setString(5, route.getId());
+            
+            return preparedStatement.executeUpdate() > 0;
         } catch (SQLException e) {
-            System.err.println("Error when updating  Route's distance: " + e.getMessage());
+            System.err.println("Error when performing full update Route: " + e.getMessage());
+            return false;
         }
-        return rowUpdated;
     }
-    
-    public boolean RemoveRoute (String id) {
-        boolean rowDeleted = false;
+
+@Override
+    public boolean Remove (String id) {
          try (PreparedStatement statement = connection.prepareStatement(DELETE_ROUTE_SQL)) {
             
              statement.setString (1, id);
-             rowDeleted = statement.executeUpdate() > 0;
-             
-             if (rowDeleted) {
-                 System.out.println ("Delete ID" + id +" Successful.");
-             } else {
-                 System.err.println ("Cannot find this ID" + id + " To Delete");
-             }
+             return statement.executeUpdate() > 0;
          } catch (SQLException e) {
              System.err.println("Error when delete Route" + e.getMessage());
+             return false;
          }
-         return rowDeleted;
     }
 }

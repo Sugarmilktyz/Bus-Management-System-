@@ -10,7 +10,7 @@ import java.util.logging.Logger;
 public class JDBCUtils {
     private static final String DB_URL = "jdbc:mysql://localhost:3306/bus_management_db";
     private static final String DB_USER = "root";
-    private static final String DB_PASSWORD = "__________"; // tui xóa mật khẩu r cần thì nhắn nha
+    private static final String DB_PASSWORD = "Sql@Bus-2005";
     
     public static Connection getConnection () {
         Connection connection = null;
