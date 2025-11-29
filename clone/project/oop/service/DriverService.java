@@ -79,9 +79,21 @@ public class DriverService {
         return driverDAO.Update(driver);
     }
     
+    public boolean UpdateDriver(String id, double newSalary) {
+    if (id == null || id.trim().isEmpty()||driverDAO.FindById(id) == null) {
+        System.err.println("Driver id invalid or cannot be update");
+        return false;
+    }
+    if (newSalary <= 0) {
+        System.err.println("Service Error: Salary must be a positive value.");
+        return false;
+    }
+    return driverDAO.UpdateDriverSalary(id, newSalary);
+}
+    
     public boolean RemoveDriver(String id) {
         if (id == null || id.trim().isEmpty()) {
-            System.err.println ("Service Error: Driver ID cannot be empty for Remove operation.");
+            System.err.println ("Driver ID cannot be empty for Remove operation.");
             return false;
         }
         try {

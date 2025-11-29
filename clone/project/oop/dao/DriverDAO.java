@@ -24,6 +24,8 @@ public class DriverDAO implements CrudDAO<Driver> {
     private static final String UPDATE_DRIVER_SQL = "UPDATE driver SET name=?, phone_number=?, address=?, license_number=?, salary=?, experience_years=? WHERE id = ?";
     private static final String COUNT_DRIVERS_SQL = "SELECT COUNT(*) FROM driver";
     private static final String GET_LAST_ID_SQL = "SELECT id FROM driver ORDER BY id DESC LIMIT 1";
+    private static final String UPDATE_SALARY_SQL = "UPDATE driver SET salary = ? WHERE id = ?";
+
     
     public String GetNextDriverId(){
         try(PreparedStatement preparedStatement= connection.prepareStatement(GET_LAST_ID_SQL);
@@ -84,6 +86,20 @@ public class DriverDAO implements CrudDAO<Driver> {
             System.err.println ("Error when finding Driver" +e.getMessage());
         }
         return driver;
+    }
+
+    public boolean UpdateDriverSalary (String id, double newSalary) {
+        try (PreparedStatement preparedStatement = connection.prepareStatement(UPDATE_SALARY_SQL)) {
+            
+            preparedStatement.setDouble (1, newSalary);
+            preparedStatement.setString (2, id);
+            
+            return preparedStatement.executeUpdate() > 0;
+            
+        } catch (SQLException e) {
+            System.err.println ("Error when updating Driver's salary: "+ e.getMessage());
+            return false;
+        }
     }
     
 @Override
@@ -146,7 +162,6 @@ public class DriverDAO implements CrudDAO<Driver> {
 @Override
     public boolean Remove (String id) {
          try (PreparedStatement statement = connection.prepareStatement(DELETE_DRIVER_SQL)) {
-            
              statement.setString (1, id);
              return statement.executeUpdate() > 0;
          } catch (SQLException e) {
