@@ -8,6 +8,8 @@ public class Assignment {
     private String routeId; 
     private String assignmentDate; 
     private String shift; 
+    
+    public Assignment(){};
 
     public Assignment(String id, String driverId, String busId, String routeId, String assignmentDate, String shift) {
         this.id = id;

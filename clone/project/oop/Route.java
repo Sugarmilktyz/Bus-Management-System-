@@ -7,8 +7,9 @@ public class Route {
     private String startPoint; 
     private String endPoint; 
     private double distance;
+    
+    public Route(){}
 
-    // Constructor đầy đủ
     public Route(String id, String name, String startPoint, String endPoint, double distance) {
         this.id = id;
         this.name = name;

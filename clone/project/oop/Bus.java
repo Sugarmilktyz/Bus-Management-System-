@@ -7,6 +7,8 @@ public class Bus {
     private int purchaseYear; 
     private boolean isActive;
     
+    public Bus(){}
+    
     public Bus(String id, String licensePlate, int capacity, String model, int purchaseYear, boolean isActive) {
         this.id = id;
         this.licensePlate = licensePlate;

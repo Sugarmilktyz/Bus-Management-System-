@@ -37,7 +37,7 @@ public class BusDAO implements CrudDAO<Bus> {
                     return String.format("B%03d", number);
                 }
         } catch (SQLException e){
-            System.err.println("Error when generating driver ID:"+ e.getMessage());
+            System.err.println("Error when generating bus ID:"+ e.getMessage());
         }
         return "B001";
     }
@@ -54,11 +54,7 @@ public class BusDAO implements CrudDAO<Bus> {
             preparedStatement.setInt(5, bus.getPurchaseYear());
             preparedStatement.setBoolean(6, bus.isActive()); 
             
-            int affected_rows= preparedStatement.executeUpdate();
-            if (affected_rows > 0) {
-            System.out.println("Bus " + bus.getId() + " added successfully model:" + bus.getModel());
-            return true;
-            }else {return false;}
+            return preparedStatement.executeUpdate()>0;
         } catch (SQLException e) {
             System.err.println ("Error when adding Bus into the Database: " +e.getMessage());
             return false;
@@ -141,23 +137,18 @@ public class BusDAO implements CrudDAO<Bus> {
             return false;
         }
     }
+    
 
 @Override
     public boolean Remove (String id) {
-        boolean rowDeleted = false;
          try (PreparedStatement statement = connection.prepareStatement(DELETE_BUS_SQL)) {
             
              statement.setString (1, id);
-             rowDeleted = statement.executeUpdate() > 0;
+             return statement.executeUpdate() > 0;
              
-             if (rowDeleted) {
-                 System.out.println ("Delete ID" + id +" Successful.");
-             } else {
-                 System.err.println ("Cannot find this ID" + id + " To Delete");
-             }
          } catch (SQLException e) {
              System.err.println("Error when delete Bus" + e.getMessage());
+             return false;
          }
-         return rowDeleted;
     }
 }

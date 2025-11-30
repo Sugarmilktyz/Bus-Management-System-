@@ -6,6 +6,8 @@ public class Driver extends Person {
     private double salary;
     private int experienceYears;
     
+    public Driver() {super();}
+    
     public Driver (String id, String name, String phoneNumber, String address, String licenseNumber, double salary, int experienceYears){
         super (id, name, phoneNumber, address);
         this.licenseNumber= licenseNumber;
